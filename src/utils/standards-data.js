@@ -1,17 +1,33 @@
 import { useEffect, useState } from "react";
 
-// data/standards.json (~0.4MB) was statically imported by a hot formatting util + several standards
-// screens, inlining it into the common bundle. Load it as its own async chunk instead. Cached at
-// module scope; preloaded on first import so sync consumers usually see data by the time they run.
+// Load the upstream CIPP standards and locally maintained custom standards.
+// Custom standards override upstream standards with the same name.
 let cache = null;
 let pending = null;
 
 export function ensureStandards() {
   if (cache) return Promise.resolve(cache);
+
   if (!pending) {
-    pending = import("../data/standards.json")
-      .then((m) => {
-        cache = m.default || m;
+    pending = Promise.all([
+      import("../data/standards.json"),
+      import("../data/custom-standards.json"),
+    ])
+      .then(([upstreamModule, customModule]) => {
+        const upstreamStandards = upstreamModule.default || upstreamModule;
+        const customStandards = customModule.default || customModule;
+
+        const customStandardNames = new Set(
+          customStandards.map((standard) => standard.name),
+        );
+
+        cache = [
+          ...upstreamStandards.filter(
+            (standard) => !customStandardNames.has(standard.name),
+          ),
+          ...customStandards,
+        ];
+
         return cache;
       })
       .catch((err) => {
@@ -19,32 +35,39 @@ export function ensureStandards() {
         throw err;
       });
   }
+
   return pending;
 }
 
-// Synchronous accessor for non-React utilities — returns [] until the chunk has loaded.
+// Synchronous accessor for non-React utilities.
+// Returns an empty array until the standards have been loaded.
 export function getStandards() {
   return cache || [];
 }
 
-// Hook for React components — re-renders once the chunk has loaded.
+// React hook that re-renders after the standards have been loaded.
 export function useStandards() {
   const [data, setData] = useState(cache || []);
+
   useEffect(() => {
     if (cache) {
       setData(cache);
       return;
     }
+
     let alive = true;
+
     ensureStandards()
-      .then((s) => {
-        if (alive) setData(s);
+      .then((standards) => {
+        if (alive) setData(standards);
       })
       .catch(() => {});
+
     return () => {
       alive = false;
     };
   }, []);
+
   return data;
 }
 
