@@ -1,0 +1,57 @@
+[
+  {
+    "name": "standards.DefenderEDRPolicy",
+    "cat": "Defender Standards",
+    "tag": [
+      "defender_edr",
+      "defender_endpoint_detection",
+      "intune_endpoint_protection"
+    ],
+    "helpText": "Deploys and enforces a Microsoft Defender for Endpoint EDR configuration policy via Intune. Controls automatic configuration from the Microsoft Defender for Endpoint connector and sample sharing.",
+    "docsDescription": "Deploys an Endpoint Detection and Response configuration policy through Intune. This standard configures whether the EDR onboarding configuration is obtained automatically from the Microsoft Defender for Endpoint connector and whether telemetry sample sharing is enabled.",
+    "executiveText": "Configures Microsoft Defender for Endpoint onboarding consistently across managed Windows devices by using the tenant-specific Microsoft Defender connector.",
+    "addedComponent": [
+      {
+        "type": "switch",
+        "name": "standards.DefenderEDRPolicy.Config",
+        "label": "Auto-configure from MDE connector",
+        "defaultValue": true
+      },
+      {
+        "type": "switch",
+        "name": "standards.DefenderEDRPolicy.SampleSharing",
+        "label": "Enable sample sharing",
+        "defaultValue": true
+      },
+      {
+        "type": "radio",
+        "name": "standards.DefenderEDRPolicy.AssignTo",
+        "label": "Policy Assignment",
+        "options": [
+          {
+            "label": "Do not assign",
+            "value": "none"
+          },
+          {
+            "label": "All users",
+            "value": "allLicensedUsers"
+          },
+          {
+            "label": "All devices",
+            "value": "AllDevices"
+          },
+          {
+            "label": "All users and devices",
+            "value": "AllDevicesAndUsers"
+          }
+        ]
+      }
+    ],
+    "label": "Defender EDR Configuration",
+    "impact": "High Impact",
+    "impactColour": "error",
+    "addedDate": "2026-04-02",
+    "powershellEquivalent": "Graph API - deviceManagement/configurationPolicies",
+    "recommendedBy": []
+  }
+]
