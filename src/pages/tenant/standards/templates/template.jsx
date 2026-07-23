@@ -5,7 +5,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { Add, SaveRounded } from '@mui/icons-material'
 import { useEffect, useState, useCallback, useMemo, useRef, lazy, Suspense } from 'react'
-import standards from '../../../../data/standards'
+import { useStandards } from '../../../../utils/standards-data'
 import CippStandardAccordion from '../../../../components/CippStandards/CippStandardAccordion'
 // Lazy load the dialog to improve initial page load performance
 const CippStandardDialog = lazy(
@@ -22,6 +22,7 @@ import { useSettings } from '../../../../hooks/use-settings'
 import { CippHead } from '../../../../components/CippComponents/CippHead'
 
 const Page = () => {
+  const standards = useStandards()
   const router = useRouter()
   const [editMode, setEditMode] = useState(false)
   const formControl = useForm({ mode: 'onBlur' })
@@ -190,7 +191,7 @@ const Page = () => {
       acc[cat].push(standard)
       return acc
     }, {})
-  }, [])
+  }, [standards])
 
   const handleOpenDialog = useCallback(() => {
     setDialogOpen(true)
